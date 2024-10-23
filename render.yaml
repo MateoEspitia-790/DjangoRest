@@ -8,7 +8,7 @@ services:
       python manage.py collectstatic --noinput &&
       python manage.py migrate
     "
-    startCommand: gunicorn esp32_data_project.wsgi:application
+    startCommand: gunicorn esp32_data.wsgi:application
     envVars:
       - key: SECRET_KEY
         value: "django-insecure-y78%0r8w1_y%8=333^&amp;@6l5b9#c*%g^%4y&amp;7x1x%q91(k9+^m9@7"  # Usa una clave secreta fuerte
