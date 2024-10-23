@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: django-api-app
+    env: python
+    plan: free
+    buildCommand: "
+      pip install -r requirements.txt &&
+      python manage.py collectstatic --noinput &&
+      python manage.py migrate
+    "
+    startCommand: gunicorn esp32_data_project.wsgi:application
+    envVars:
+      - key: SECRET_KEY
+        value: "django-insecure-y78%0r8w1_y%8=333^&amp;@6l5b9#c*%g^%4y&amp;7x1x%q91(k9+^m9@7"  # Usa una clave secreta fuerte
+      - key: DEBUG
+        value: "False"  # Asegúrate de que DEBUG esté en False en producción
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ESP32_DATA  # El nombre de tu base de datos creada en Render
