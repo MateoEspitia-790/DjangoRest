@@ -26,7 +26,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-y78%0r8w1_y%8=333^&amp;@6l
 DEBUG = os.getenv('DEBUG', 'False') == 'True'  # Asegúrate de que DEBUG esté desactivado en producción
 
 
-ALLOWED_HOSTS = ['https://django-api-sensor-to-db.onrender.com', 'localhost']
+ALLOWED_HOSTS = ['django-api-sensor-to-db.onrender.com', 'localhost']
 
 # Application definition
 
