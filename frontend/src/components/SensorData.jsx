@@ -8,7 +8,7 @@ const SensorData = () => {
 
   useEffect(() => {
     // URL de la API en Django para obtener los datos del sensor
-    const apiUrl = 'https://django-api-sensor-to-db.onrender.com/api/sensor_data/';
+    const apiUrl = 'http://127.0.0.1:8000/api/sensor_data/';
 
     // Hacer una solicitud GET a la API
     fetch(apiUrl)

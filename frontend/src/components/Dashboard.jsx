@@ -43,7 +43,7 @@ const Dashboard = () => {
     // Función para cargar datos iniciales
     const loadData = async () => {
       try {
-        const response = await fetch('https://django-api-sensor-to-db.onrender.com/api/sensor_data/');
+        const response = await fetch('http://127.0.0.1:8000/api/sensor_data/');
         const data = await response.json();
         const formattedData = data.map((item) => ({
           time: new Date(item.timestamp).getTime() / 1000,
@@ -63,7 +63,7 @@ const Dashboard = () => {
     // Configurar la actualización automática cada 5 segundos
     const intervalId = setInterval(async () => {
       try {
-        const response = await fetch('https://django-api-sensor-to-db.onrender.com/api/sensor_data/');
+        const response = await fetch('http://127.0.0.1:8000/api/sensor_data/');
         const data = await response.json();
         const latestData = data[data.length - 1];
         

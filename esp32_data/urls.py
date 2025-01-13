@@ -19,7 +19,7 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('sensor_data.urls')),  # Incluye las rutas de la app sensor_data
+    path('api/sensor_data/', include('sensor_data.urls')),  # Incluye las rutas de la app sensor_data
 ]
 
 
