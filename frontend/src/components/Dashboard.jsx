@@ -1,58 +1,21 @@
-// src/components/Dashboard.jsx
-import React, { useEffect, useRef, useState } from 'react';
-import { createChart } from 'lightweight-charts';
+import React, { useEffect, useState } from 'react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const Dashboard = () => {
-  const chartContainerRef = useRef(null);
-  const chartRef = useRef(null);
-  const seriesRef = useRef(null);
-  // Estado para almacenar los datos del gráfico y actualizar el componente
   const [chartData, setChartData] = useState([]);
 
   useEffect(() => {
-    // Crear el gráfico y la serie solo una vez
-    if (!chartRef.current) {
-      chartRef.current = createChart(chartContainerRef.current, {
-        width: chartContainerRef.current.clientWidth,
-        height: 400,
-        layout: {
-          backgroundColor: '#ffffff',
-          textColor: '#333',
-        },
-        grid: {
-          vertLines: { color: '#e0e0e0' },
-          horzLines: { color: '#e0e0e0' },
-        },
-        crosshair: {
-          mode: 1,
-        },
-        rightPriceScale: {
-          borderColor: '#e0e0e0',
-        },
-        timeScale: {
-          borderColor: '#e0e0e0',
-        },
-      });
-
-      seriesRef.current = chartRef.current.addLineSeries({
-        color: '#2e7d32',
-        lineWidth: 2,
-      });
-    }
-
     // Función para cargar datos iniciales
     const loadData = async () => {
       try {
         const response = await fetch('http://127.0.0.1:8000/api/sensor_data/');
         const data = await response.json();
         const formattedData = data.map((item) => ({
-          time: new Date(item.timestamp).getTime() / 1000,
+          time: new Date(item.timestamp).toLocaleTimeString(), // Formatear como hora legible
           value: item.value,
         }));
 
-        // Establecer los datos iniciales en el gráfico y actualizar el estado
-        seriesRef.current.setData(formattedData);
-        setChartData(formattedData);
+        setChartData(formattedData); // Establecer datos iniciales
       } catch (error) {
         console.error('Error al obtener los datos:', error);
       }
@@ -66,36 +29,52 @@ const Dashboard = () => {
         const response = await fetch('http://127.0.0.1:8000/api/sensor_data/');
         const data = await response.json();
         const latestData = data[data.length - 1];
-        
-        const newData = {
-          time: new Date(latestData.timestamp).getTime() / 1000,
-          value: latestData.value,
-        };
 
-        // Actualizar el gráfico y el estado para forzar el re-renderizado
-        seriesRef.current.update(newData);
-        setChartData((prevData) => [...prevData, newData]);
+        // Verificar si hay una nueva entrada comparando con el último dato del estado
+        if (
+          chartData.length === 0 || 
+          latestData.timestamp !== chartData[chartData.length - 1].timestamp
+        ) {
+          const newData = {
+            time: new Date(latestData.timestamp).toLocaleTimeString(),
+            value: latestData.value,
+          };
+
+          // Actualizar el estado con el nuevo dato
+          setChartData((prevData) => [...prevData, newData]);
+        }
       } catch (error) {
         console.error('Error al obtener los datos:', error);
       }
     }, 5000);
 
-    return () => clearInterval(intervalId);  // Limpiar el intervalo al desmontar el componente
-  }, []);
+    return () => clearInterval(intervalId); // Limpiar el intervalo al desmontar el componente
+  }, [chartData]); // Dependencia para usar el estado más reciente
 
   return (
     <div>
       <h2>Dashboard de Sensores en Tiempo Real</h2>
-      <div
-        ref={chartContainerRef}
-        style={{
-          position: 'relative',
-          width: '100%',
-          maxWidth: '800px',
-          height: '400px',
-          margin: '0 auto',
-        }}
-      />
+      <ResponsiveContainer width="100%" height={400}>
+        <AreaChart data={chartData}>
+          <defs>
+            <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#2e7d32" stopOpacity={0.8} />
+              <stop offset="95%" stopColor="#2e7d32" stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="time" />
+          <YAxis />
+          <Tooltip />
+          <Area
+            type="monotone"
+            dataKey="value"
+            stroke="#2e7d32"
+            fillOpacity={1}
+            fill="url(#colorValue)"
+          />
+        </AreaChart>
+      </ResponsiveContainer>
       <div>
         <h3>Últimos datos del sensor:</h3>
         {chartData.length > 0 && (
