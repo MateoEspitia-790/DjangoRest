@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, NavLink } from 'react-router-dom';
+import { FaHome, FaSeedling, FaCloudSun, FaBriefcase, FaStar } from 'react-icons/fa';
 import SensorData from './components/SensorData';
 import Dashboard from './components/Dashboard';
 import Predicciones from './components/predicciones';
@@ -18,38 +19,38 @@ function App() {
         <aside className="sidebar">
           <nav className="sidebar-nav">
             <NavLink to="/" className="sidebar-link" activeClassName="active-link">
-              <span className="icon">🏠</span>
+              <span className="icon"><FaHome /></span>
               <span className="link-text">Inicio</span>
             </NavLink>
             <NavLink to="/estaciones" className="sidebar-link" activeClassName="active-link">
-              <span className="icon">🌱</span>
+              <span className="icon"><FaSeedling /></span>
               <span className="link-text">Estaciones</span>
             </NavLink>
             <NavLink to="/predicciones" className="sidebar-link" activeClassName="active-link">
-              <span className="icon">🌤️</span>
+              <span className="icon"><FaCloudSun /></span>
               <span className="link-text">Predicciones</span>
             </NavLink>
             <NavLink to="/trabajo" className="sidebar-link" activeClassName="active-link">
-              <span className="icon">💼</span>
+              <span className="icon"><FaBriefcase /></span>
               <span className="link-text">Trabajo</span>
             </NavLink>
             <NavLink to="/extras" className="sidebar-link" activeClassName="active-link">
-              <span className="icon">⭐</span>
+              <span className="icon"><FaStar /></span>
               <span className="link-text">Extras</span>
             </NavLink>
           </nav>
         </aside>
 
         {/* Contenido principal */}
-        <main className="main-content">
-          <Routes>
-            <Route path="/" element={<SensorData />} />
-            <Route path="/estaciones" element={<Dashboard />} />
-            <Route path="/predicciones" element={<Predicciones />} />
-            <Route path="/trabajo" element={<div>Trabajo Cultivo</div>} />
-            <Route path="/extras" element={<div>Extras</div>} />
-          </Routes>
-        </main>
+          <main className="main-content">
+            <Routes>
+              <Route path="/" element={<SensorData />} />
+              <Route path="/estaciones" element={<Dashboard />} />
+              <Route path="/predicciones" element={<Predicciones />} />
+              <Route path="/trabajo" element={<div>Trabajo Cultivo</div>} />
+              <Route path="/extras" element={<div>Extras</div>} />
+            </Routes>
+          </main>
       </div>
     </Router>
   );

@@ -1,5 +1,6 @@
 // src/components/SensorData.jsx
 import React, { useEffect, useState } from 'react';
+import Dashboard from './Dashboard';
 
 const SensorData = () => {
   const [data, setData] = useState([]);
@@ -33,15 +34,23 @@ const SensorData = () => {
 
   return (
     <div>
+      <h2></h2>
+      <Dashboard />
       <h2>Datos del Sensor</h2>
       <ul>
         {data.map((sensor, index) => (
-          <li key={index}>
-            <strong>Nombre del Sensor:</strong> {sensor.sensor_name}<br />
-            <strong>Valor:</strong> {sensor.value}<br />
-            <strong>Fecha:</strong> {new Date(sensor.timestamp).toLocaleString()}
-          </li>
-        ))}
+      <li key={index}>
+        <span className="sensor-name">
+        <strong>Nombre:</strong> {sensor.name}
+        </span>
+        <span className="sensor-value">
+        <strong>Valor:</strong> {sensor.value}
+        </span>
+        <span className="sensor-date">
+        <strong>Fecha:</strong> {new Date(sensor.timestamp).toLocaleString()}
+        </span>
+      </li>
+      ))}
       </ul>
     </div>
   );

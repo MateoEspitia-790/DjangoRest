@@ -1,64 +1,108 @@
 import React, { useEffect, useState } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, LayersControl } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
 
 const Predicciones = () => {
-  const [realtimeWeather, setRealtimeWeather] = useState(null);
+  const [weatherData, setWeatherData] = useState(null);
   const [error, setError] = useState(null);
 
-  const apiKey = 'IX8T2kY18YDc6Ct7CzHMYQRxMRIeumbU';
-  const location = { lat: 7.5776, lon: -72.4757 }; // Coordenadas de Ragonvalia, Norte de Santander, Colombia
-  const mapLayer = 'precipitation'; // Tipo de capa del mapa
+  const apiKey = '0dd338274365787f863893853205ec66'; // API Key de OpenWeatherMap
+  const ragonvaliaCoords = [7.5776, -72.4757]; // Coordenadas de Ragonvalia, Norte de Santander
 
   useEffect(() => {
-    // Obtener datos de tiempo real
-    const fetchRealtimeWeather = async () => {
+    // Obtener datos de clima desde OpenWeatherMap
+    const fetchWeatherData = async () => {
       try {
         const response = await fetch(
-          `https://api.tomorrow.io/v4/timelines?location=${location.lat},${location.lon}&fields=temperature,humidity,precipitationIntensity&units=metric&timesteps=current&apikey=${apiKey}`
+          `https://api.openweathermap.org/data/2.5/weather?lat=${ragonvaliaCoords[0]}&lon=${ragonvaliaCoords[1]}&units=metric&appid=${apiKey}&lang=es`
         );
         if (!response.ok) {
           throw new Error('Error al obtener los datos del clima');
         }
         const data = await response.json();
-        setRealtimeWeather(data.data.timelines[0].intervals[0].values);
+        setWeatherData(data);
       } catch (error) {
         setError(error.message);
       }
     };
 
-    fetchRealtimeWeather();
+    fetchWeatherData();
   }, []);
-
-  // Actualiza la URL del mapa para usar las coordenadas y capa definidas
-  const mapUrl = `https://api.tomorrow.io/v4/map/tile/${mapLayer}/current/8/0/0/256.png?apikey=${apiKey}&location=${location.lat},${location.lon}`;
 
   return (
     <div>
-      <h2>Predicciones del Clima</h2>
+      <h2>Dashboard Meteorológico</h2>
       <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-        {/* Clima en tiempo real */}
+        {/* Sección de datos del clima */}
         <div style={{ flex: '1', border: '1px solid #ddd', padding: '10px', borderRadius: '8px' }}>
           <h3>Clima en Tiempo Real</h3>
           {error ? (
             <p>Error: {error}</p>
-          ) : realtimeWeather ? (
+          ) : weatherData ? (
             <div>
-              <p>Temperatura: {realtimeWeather.temperature} °C</p>
-              <p>Humedad: {realtimeWeather.humidity} %</p>
-              <p>Intensidad de Precipitación: {realtimeWeather.precipitationIntensity} mm/h</p>
+              <p>Ciudad: {weatherData.name}</p>
+              <p>Temperatura: {weatherData.main.temp} °C</p>
+              <p>Humedad: {weatherData.main.humidity} %</p>
+              <p>Clima: {weatherData.weather[0].description}</p> {/* Aquí ya estará en español */}
+              <p>Viento: {weatherData.wind.speed} m/s</p>
+              <p>Presión Atmosférica: {weatherData.main.pressure} hPa</p>
             </div>
           ) : (
             <p>Cargando...</p>
           )}
         </div>
 
-        {/* Mapa meteorológico */}
+        {/* Sección del mapa meteorológico */}
         <div style={{ flex: '1', border: '1px solid #ddd', padding: '10px', borderRadius: '8px' }}>
           <h3>Mapa Meteorológico</h3>
-          <img
-            src={mapUrl}
-            alt="Mapa Meteorológico"
-            style={{ width: '100%', height: 'auto', borderRadius: '8px' }}
-          />
+          <MapContainer
+            center={ragonvaliaCoords}
+            zoom={10} // Nivel de zoom para centrar en Ragonvalia
+            style={{ height: '400px', width: '100%' }}
+          >
+            <LayersControl position="topright">
+              {/* Capa base de OpenStreetMap (Carreteras) */}
+              <LayersControl.BaseLayer checked name="Carreteras">
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution="&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors"
+                />
+              </LayersControl.BaseLayer>
+
+              {/* Capa de temperatura */}
+              <LayersControl.Overlay name="Temperatura">
+                <TileLayer
+                  url={`https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=${apiKey}`}
+                  attribution="&copy; <a href='https://openweathermap.org/'>OpenWeatherMap</a> contributors"
+                />
+              </LayersControl.Overlay>
+
+              {/* Capa de precipitaciones */}
+              <LayersControl.Overlay name="Precipitación">
+                <TileLayer
+                  url={`https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${apiKey}`}
+                  attribution="&copy; <a href='https://openweathermap.org/'>OpenWeatherMap</a> contributors"
+                />
+              </LayersControl.Overlay>
+
+              {/* Capa de presión atmosférica */}
+              <LayersControl.Overlay name="Presión Atmosférica">
+                <TileLayer
+                  url={`https://tile.openweathermap.org/map/pressure_new/{z}/{x}/{y}.png?appid=${apiKey}`}
+                  attribution="&copy; <a href='https://openweathermap.org/'>OpenWeatherMap</a> contributors"
+                />
+              </LayersControl.Overlay>
+            </LayersControl>
+
+            {/* Marcador para Ragonvalia */}
+            <Marker position={ragonvaliaCoords}>
+              <Popup>
+                <strong>Ragonvalia</strong>
+                <br />
+                Norte de Santander, Colombia
+              </Popup>
+            </Marker>
+          </MapContainer>
         </div>
       </div>
     </div>
